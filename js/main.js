@@ -153,20 +153,25 @@
             // 目录高度
             let tocHeight = $toc.height();
             // 滚动至左侧消失
-            if (scrollTop > leftEnd - tocHeight) {
-                $toc.css('width', _leftEnd.width() + 'px');
-                $toc.css('position', 'fixed');
-                let newTop = 100;
+            if (scrollTop > leftEnd) {
+                //$toc.css('width', _leftEnd.width() + 'px');
+                //$toc.css('position', 'fixed');
+                //let newTop = 100;
                 // 右侧边栏显示在左侧
                 if (_rightShadow.height() > 10) {
-                    newTop = _rightShadow.height() + 10;
+                    let newTop = _rightShadow.height() + 32;
+                    $toc.css('top', newTop + 'px');
+                } else {
+                    $toc.css('top', '');
                 }
-                $toc.css('top', newTop + 'px');
+                $toc.addClass('is-sticky');
             } else if (scrollTop < tocHeight + leftEnd) {
                 // 恢复默认
-                $toc.css('width', '');
-                $toc.css('position', '');
+                //$toc.css('width', '');
+                //$toc.css('position', '');
+                //$toc.css('top', '');
                 $toc.css('top', '');
+                $toc.removeClass('is-sticky');
             }
         }
         $(window).scroll(floatToc);
