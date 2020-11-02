@@ -133,5 +133,43 @@
         $toc.on('click', toggleToc);
         $mask.on('click', toggleToc);
         $('.navbar-main .catalogue').on('click', toggleToc);
+
+        /** 解决目录滚动后被覆盖 begin */
+        const _colMain = $('.column-main');
+        const _colLeft = $('.column-left');
+        const _rightShadow = $('.column-right-shadow');
+        const _leftEnd = $('#left-end')
+        function floatToc() {
+            // 手机模式
+            let mainTop = _colMain.offset().top;
+            let leftTop = _colLeft.offset().top;
+            if (mainTop - leftTop > 100) {
+                return;
+            }
+            // 滚动距离
+            let scrollTop = $(window).scrollTop();
+            // 左侧高度
+            let leftEnd = _leftEnd.offset().top;
+            // 目录高度
+            let tocHeight = $toc.height();
+            // 滚动至左侧消失
+            if (scrollTop > leftEnd - tocHeight) {
+                $toc.css('width', _leftEnd.width() + 'px');
+                $toc.css('position', 'fixed');
+                let newTop = 100;
+                // 右侧边栏显示在左侧
+                if (_rightShadow.height() > 10) {
+                    newTop = _rightShadow.height() + 10;
+                }
+                $toc.css('top', newTop + 'px');
+            } else if (scrollTop < tocHeight + leftEnd) {
+                // 恢复默认
+                $toc.css('width', '');
+                $toc.css('position', '');
+                $toc.css('top', '');
+            }
+        }
+        $(window).scroll(floatToc);
+        /** 解决目录滚动后被覆盖 end */
     }
 }(jQuery, window.moment, window.ClipboardJS, window.IcarusThemeSettings));
