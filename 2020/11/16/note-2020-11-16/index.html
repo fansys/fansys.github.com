@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"><meta><title>学习笔记 2020-11-16 - Fansy&#039;s Blog</title><link rel="manifest" href="/manifest.json"><meta name="theme-color" content="#3273dc"><meta name="application-name" content="Fansy&#039;s Blog"><meta name="msapplication-TileImage" content="/img/favicon.svg"><meta name="msapplication-TileColor" content="#3273dc"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Fansy&#039;s Blog"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta description="今天简单学习了 Spring 和 NettySpring  Spring 的基本特性和模块，IoC 和 AOP Spring Bean 的生命周期 Spring MVC 的流程 Spring 事务  Netty  Netty 的组件 Netty 初始化方式 Netty 长连接和心跳 Netty 沾包&amp;#x2F;拆包解决方式"><meta property="og:type" content="blog"><meta property="og:title" content="学习笔记 2020-11-16"><meta property="og:url" content="https://blog.fansy.cloud/2020/11/16/note-2020-11-16/"><meta property="og:site_name" content="Fansy&#039;s Blog"><meta property="og:description" content="今天简单学习了 Spring 和 NettySpring  Spring 的基本特性和模块，IoC 和 AOP Spring Bean 的生命周期 Spring MVC 的流程 Spring 事务  Netty  Netty 的组件 Netty 初始化方式 Netty 长连接和心跳 Netty 沾包&amp;#x2F;拆包解决方式"><meta property="og:locale" content="zh_CN"><meta property="og:image" content="https://blog.fansy.cloud/2020/11/16/note-2020-11-16/IoC%E5%85%B3%E7%B3%BB.jpg"><meta property="og:image" content="https://blog.fansy.cloud/2020/11/16/note-2020-11-16/SpringIoC%E7%9A%84%E5%88%9D%E5%A7%8B%E5%8C%96%E8%BF%87%E7%A8%8B.png"><meta property="og:image" content="https://blog.fansy.cloud/2020/11/16/note-2020-11-16/SpringBean%E5%88%9B%E5%BB%BA%E8%BF%87%E7%A8%8B.jpg"><meta property="og:image" content="https://blog.fansy.cloud/2020/11/16/note-2020-11-16/SpringBean%E5%88%9B%E5%BB%BA%E8%BF%87%E7%A8%8B_zh.jpg"><meta property="og:image" content="https://blog.fansy.cloud/2020/11/16/note-2020-11-16/SpringMVC%E5%A4%84%E7%90%86%E6%B5%81%E7%A8%8B.jpg"><meta property="article:published_time" content="2020-11-16T06:08:13.000Z"><meta property="article:modified_time" content="2020-11-16T15:57:30.690Z"><meta property="article:author" content="Cheney"><meta property="article:tag" content="学习笔记"><meta property="article:tag" content="Spring"><meta property="twitter:card" content="summary"><meta property="twitter:image" content="/2020/11/16/note-2020-11-16/IoC%E5%85%B3%E7%B3%BB.jpg"><script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://blog.fansy.cloud/2020/11/16/note-2020-11-16/"},"headline":"Fansy's Blog","image":["https://blog.fansy.cloud/2020/11/16/note-2020-11-16/IoC%E5%85%B3%E7%B3%BB.jpg","https://blog.fansy.cloud/2020/11/16/note-2020-11-16/SpringIoC%E7%9A%84%E5%88%9D%E5%A7%8B%E5%8C%96%E8%BF%87%E7%A8%8B.png","https://blog.fansy.cloud/2020/11/16/note-2020-11-16/SpringBean%E5%88%9B%E5%BB%BA%E8%BF%87%E7%A8%8B.jpg","https://blog.fansy.cloud/2020/11/16/note-2020-11-16/SpringBean%E5%88%9B%E5%BB%BA%E8%BF%87%E7%A8%8B_zh.jpg","https://blog.fansy.cloud/2020/11/16/note-2020-11-16/SpringMVC%E5%A4%84%E7%90%86%E6%B5%81%E7%A8%8B.jpg"],"datePublished":"2020-11-16T06:08:13.000Z","dateModified":"2020-11-16T15:57:30.690Z","author":{"@type":"Person","name":"Cheney"},"description":"今天简单学习了 Spring 和 NettySpring  Spring 的基本特性和模块，IoC 和 AOP Spring Bean 的生命周期 Spring MVC 的流程 Spring 事务  Netty  Netty 的组件 Netty 初始化方式 Netty 长连接和心跳 Netty 沾包&#x2F;拆包解决方式"}</script><link rel="canonical" href="https://blog.fansy.cloud/2020/11/16/note-2020-11-16/"><link rel="icon" href="/img/favicon.svg"><link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@9.12.0/styles/atom-one-light.css"><link rel="stylesheet" href="https://fonts.loli.net/css2?family=Ubuntu:wght@400;600&amp;family=Source+Code+Pro"><link rel="stylesheet" href="/css/default.css"><style>body>.footer,body>.navbar,body>.section{opacity:0}</style><!--!--><!--!--><!--!--><!--!--><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@1.6.8/dist/css/lightgallery.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/justifiedGallery@3.7.0/dist/css/justifiedGallery.min.css"><!--!--><!--!--><script src="https://cdn.jsdelivr.net/npm/pace-js@1.0.2/pace.min.js"></script><!--!--><!--!--><meta name="generator" content="Hexo 5.2.0"></head><body class="is-3-column"><nav class="navbar navbar-main"><div class="container"><div class="navbar-brand justify-content-center"><a class="navbar-item navbar-logo" href="/">Fansy&#039;s Blog</a></div><div class="navbar-menu"><div class="navbar-start"><a class="navbar-item" href="/">首页</a><a class="navbar-item" href="/categories/">分类</a><a class="navbar-item" href="/archives/">归档</a><a class="navbar-item" href="/tags/">标签</a><a class="navbar-item" href="/about/">关于我</a></div><div class="navbar-end"><a class="navbar-item" target="_blank" rel="noopener" title="GitHub" href="https://gitee.com/fansys"><i class="fab fa-github"></i></a><a class="navbar-item is-hidden-tablet catalogue" title="目录" href="javascript:;"><i class="fas fa-list-ul"></i></a><a class="navbar-item search" title="搜索" href="javascript:;"><i class="fas fa-search"></i></a></div></div></div></nav><section class="section"><div class="container"><div class="columns"><div class="column order-2 column-main is-8-tablet is-8-desktop is-6-widescreen"><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2020-11-16T06:08:13.000Z" title="2020-11-16T06:08:13.000Z">2020-11-16</time>发表</span><span class="level-item"><time dateTime="2020-11-16T15:57:30.690Z" title="2020-11-16T15:57:30.690Z">2020-11-16</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a></span><span class="level-item">26 分钟读完 (大约3936个字)</span></div></div><h1 class="title is-3 is-size-4-mobile">学习笔记 2020-11-16</h1><div class="content"><p>今天简单学习了 Spring 和 Netty<br><strong>Spring</strong></p>
+<ul>
+<li>Spring 的基本特性和模块，<code>IoC</code> 和 <code>AOP</code></li>
+<li>Spring Bean 的生命周期</li>
+<li>Spring MVC 的流程</li>
+<li>Spring 事务</li>
+</ul>
+<p><strong>Netty</strong></p>
+<ul>
+<li>Netty 的组件</li>
+<li>Netty 初始化方式</li>
+<li>Netty 长连接和心跳</li>
+<li>Netty 沾包/拆包解决方式</li>
+</ul>
+<a id="more"></a>
+
+<h2 id="Spring"><a href="#Spring" class="headerlink" title="Spring"></a>Spring</h2><h3 id="Spring-特征"><a href="#Spring-特征" class="headerlink" title="Spring 特征"></a>Spring 特征</h3><ul>
+<li>核心技术：DI、AOP、事件(Events)、资源、i18n、验证、数据绑定、类型转换，SpEL</li>
+<li>测试：模拟对象、TestContext测试、Spring MVC测试、WebTestClient</li>
+<li>数据访问：事务、DAO支持、JDBC、ORM、编组XML</li>
+<li>Web支持：Spring MVC, Spring WebFlux</li>
+<li>集成：远程处理、JMS、JCA、JMX、电子邮件、任务、调度、缓存</li>
+<li>语言：Kotlin、Groovy、动态语言</li>
+</ul>
+<h3 id="Spring-模块"><a href="#Spring-模块" class="headerlink" title="Spring 模块"></a>Spring 模块</h3><ul>
+<li>Spring Core: Spring 基础，其他模块的底层依赖，主要提供 IOC 依赖注入支持</li>
+<li>Spring Aspects: 提供和 AspectJ 的集成支持</li>
+<li>Spring AOP: 提供面向切面的编程实现</li>
+<li>Spring JDBC: Java 数据库连接</li>
+<li>Spring JMS: Java 消息服务</li>
+<li>Spring ORM: 为 Hibernate 等 ORM 框架提供支持</li>
+<li>Spring Web: 为创建 Web 应用程序提供支持</li>
+<li>Spring Test: 提供了对 Junit 和 TestNG 测试的支持</li>
+</ul>
+<h3 id="对-Spring-的-IoC-和-AOP-的理解"><a href="#对-Spring-的-IoC-和-AOP-的理解" class="headerlink" title="对 Spring 的 IoC 和 AOP 的理解"></a>对 Spring 的 IoC 和 AOP 的理解</h3><p><strong>IoC(Inverse of Control: 控制反转)</strong><br>IoC 是一种设计思想，将原本在程序中手动创建对象的控制权交由容器来管理。<br>Spring 中实现 IoC 的方式是维护一个 IoC 容器，实际上是一个Map，如果是单例对象，本质是在 <code>DefaultSingletonBeanRegistry.singletonObjects</code> 中获取 Bean 实例。<br>使用 IoC 后，可以将依赖注入交给 IoC 容器管理，不再需要从上到下的创建依赖对象</p>
+<ul>
+<li>DIP: (Dependency Inversion Principle) 依赖导致原则</li>
+<li>IoC: (Inverse of Control) 控制反转</li>
+<li>DI: (Dependency Injection) 依赖注入</li>
+</ul>
+<p>三者的关系如下：  </p>
+<img src="/2020/11/16/note-2020-11-16/IoC%E5%85%B3%E7%B3%BB.jpg" class="" title="DIP-IoC-DI"> 
+
+<p>Spring IoC 的初始化过程：  </p>
+<img src="/2020/11/16/note-2020-11-16/SpringIoC%E7%9A%84%E5%88%9D%E5%A7%8B%E5%8C%96%E8%BF%87%E7%A8%8B.png" class="" title="Spring IoC 的初始化过程"> 
+
+<p><strong>AOP(Aspect-Oriented Programming:面向切面编程)</strong><br>面向切面编程，能够将与业务无关的代码却模块间共用的代码封装起来，减少系统的重复代码，降低模块耦合性。<br>如：事务管理、权限管理、日志管理等<br>Spring 的 AOP 只支持方法增强，使用的代理模式为：</p>
+<ul>
+<li>面向接口：JDK代理，CGLib代理(继承实现)</li>
+<li>面向类：CGLib代理</li>
+</ul>
+<p><strong>Spring AOP 和 AspectJ</strong></p>
+<ul>
+<li>Spring AOP 属于运行时增强/织入<blockquote>
+<p>Spring AOP 使用了 AspectJ 的一些注解，使用 <code>AspectJ</code> 来定义切面，使用 <code>PointCut</code> 定义切入点，使用 <code>Advice</code> 来增强处理<br>但不是使用的 AspectJ 语法，而是使用的JDK动态代理或CGLib  </p>
+</blockquote>
+</li>
+<li>AspectJ 属于编译时增强/织入</li>
+</ul>
+<p><strong>AOP失效的原因</strong><br>Spring AOP 在以下场景会失效</p>
+<ol>
+<li>没有被 Spring 管理</li>
+<li>bean 自身调用自身，通过 this. 调用</li>
+<li>方法不是 public 方法</li>
+<li></li>
+</ol>
+<h3 id="Spring-Bean-的作用域"><a href="#Spring-Bean-的作用域" class="headerlink" title="Spring Bean 的作用域"></a>Spring Bean 的作用域</h3><p>Spring Bean包含以下作用域</p>
+<ul>
+<li>singleton: 单例</li>
+<li>prototype: 每次请求创建一个对象</li>
+<li>request: 每次HTTP请求创建一个对象</li>
+<li>session: 每次HTTP会话创建一个对象</li>
+<li>global-session: 全局session作用域，仅在portlet应用中有用，Spring5已经废弃</li>
+</ul>
+<p><strong>Spring获取Bean的流程</strong></p>
+<ol>
+<li>获取BeanName，如果传入的是classType，则从<code>DefaultListableBeanFactory.allBeanNamesByType</code> 中获取对应的beanName</li>
+<li>根据beanName在<code>DefaultSingletonBeanRegistry.singletonObjects</code>中查找单例Bean</li>
+<li>如果找到了则返回，如果没有找到则查询 <code>BeanDefinition</code></li>
+<li>获取bean的依赖，提前先创建依赖</li>
+<li>如果是prototype，创建完bean后直接返回</li>
+<li>如果是singleton，创建完bean后回调，将bean放入<code>singletonObjects</code> 和 <code>registeredSingletons</code> 缓存中</li>
+</ol>
+<p><strong>单例Bean的线程安全</strong></p>
+<ol>
+<li>尽量避免使用全局变量</li>
+<li>使用ThreadLocal变量隔离线程</li>
+</ol>
+<h3 id="Spring-Bean的生命周期"><a href="#Spring-Bean的生命周期" class="headerlink" title="Spring Bean的生命周期"></a>Spring Bean的生命周期</h3><ol>
+<li>Bean 容器找到配置文件中 BeanDefinition</li>
+<li>利用 Java Reflection API 创建一个 Bean 的实例</li>
+<li>如果涉及一些属性值，则利用 <code>setXX()</code> 方法设置属性</li>
+<li>如果 Bean 实现了 <code>BeanNameAware</code> 接口，则调用 <code>setBeanName()</code> 方法传入 Bean 的名称</li>
+<li>如果 Bean 实现了 <code>BeanClassLoaderAware</code> 接口，则调用 <code>setBeanClassLoader()</code> 方法传入 <code>ClassLoader</code> 对象实例</li>
+<li>如果 Bean 实现了 <code>BeanFactoryAware</code> 接口，则调用 <code>setBeanFactory()</code> 方法传入 <code>BeanFactory</code> 对象实例</li>
+<li>如果 Bean 实现了其他的 <code>*Aware</code> 接口，则调用相应的方法</li>
+<li>如果有和加载这个 Bean 的 Spring 容器相关的 <code>BeanPostProcessor</code> 对象，则执行 <code>postProcessBeforeIntialization()</code> 方法</li>
+<li>如果 Bean 实现了 <code>InitalizingBean</code> 接口，则调用 <code>afterPropertiesSet()</code> 方法</li>
+<li>如果 Bean 配置文件定义了 <code>init-method</code> 方法，则执行指定的方法</li>
+<li>如果有和加载这个 Bean 的 Spring 容器相关的 <code>BeanPostProcessor</code> 对象，则执行 <code>postProcessAfterInitialization()</code> 方法</li>
+<li>销毁：如果实现了 <code>DisposableBean</code> 接口，则调用 <code>destory()</code> 方法</li>
+<li>销毁：如果 Bean 配置文件定义了 <code>destory-method</code> 方法，则执行指定的方法</li>
+</ol>
+<p>图示：  </p>
+<img src="/2020/11/16/note-2020-11-16/SpringBean%E5%88%9B%E5%BB%BA%E8%BF%87%E7%A8%8B.jpg" class="" title="Spring Bean 创建过程">   
+
+<p>中文版：  </p>
+<img src="/2020/11/16/note-2020-11-16/SpringBean%E5%88%9B%E5%BB%BA%E8%BF%87%E7%A8%8B_zh.jpg" class="" title="Spring Bean 创建过程">   
+
+
+<h2 id="Spring-MVC"><a href="#Spring-MVC" class="headerlink" title="Spring MVC"></a>Spring MVC</h2><h3 id="对于-Sping-MVC-的理解"><a href="#对于-Sping-MVC-的理解" class="headerlink" title="对于 Sping MVC 的理解"></a>对于 Sping MVC 的理解</h3><p>Spring 分离了控制器、模型对象、分派器以及处理程序对象的角色，分离后更易定制。<br>Spring MVC 框架主要有 DispatcherServlet、处理器映射、处理器（控制器）、视图解析器、视图组成。</p>
+<h3 id="Spring-MVC-工作原理"><a href="#Spring-MVC-工作原理" class="headerlink" title="Spring MVC 工作原理"></a>Spring MVC 工作原理</h3><img src="/2020/11/16/note-2020-11-16/SpringMVC%E5%A4%84%E7%90%86%E6%B5%81%E7%A8%8B.jpg" class="" title="Spring MVC 处理流程">  
+<p>主要流程：  </p>
+<ol>
+<li><p>客户端发起请求，直接请求到 <code>DispatcherServlet</code>  </p>
+</li>
+<li><p><code>DispatcherServlet</code> 根据请求信息调用 <code>HandlerMapping</code>，解析请求对应的 <code>Handler</code><br>此时返回的是 <code>executionChain</code> 包含 <code>HandlerInterceptor</code>  </p>
+</li>
+<li><p>解析到对应的 <code>Handler</code>（通常所说的Controller）后，开始由 <code>HandlerAdapter</code> 适配器处理<br>先执行 <code>HandlerInterceptor</code> 的 <code>applyPreHandle()</code> 方法<br>然后执行 <code>HandlerAdapter</code> 的 <code>handle()</code> 方法<br>最后执行 <code>HandlerInterceptor</code> 的 <code>applyPostHandle()</code> 方法</p>
+</li>
+<li><p><code>HandlerAdapter</code> 调用真正的处理器处理请求，并处理相应的业务逻辑，处理完成后返回一个 <code>ModelAndView</code> 对象<br><code>Model</code> 对应的数据对象，<code>View</code> 对应逻辑视图  </p>
+</li>
+<li><p><code>ViewResolver</code> 根据逻辑视图解析出实际的视图  </p>
+</li>
+<li><p><code>DispatcherServlet</code> 将 <code>Model</code> 传给实际的 <code>View</code> 渲染  </p>
+</li>
+<li><p><code>DispatcherServlet</code> 将渲染结果返回给客户端</p>
+</li>
+</ol>
+<h2 id="Spring-事务"><a href="#Spring-事务" class="headerlink" title="Spring 事务"></a>Spring 事务</h2><h3 id="Spring-事务简介"><a href="#Spring-事务简介" class="headerlink" title="Spring 事务简介"></a>Spring 事务简介</h3><p>Spring 事务分为：</p>
+<ul>
+<li>声明式事务：XML配置或注解</li>
+<li>编程式事务：硬编码</li>
+</ul>
+<h3 id="Spring-事务的隔离级别"><a href="#Spring-事务的隔离级别" class="headerlink" title="Spring 事务的隔离级别"></a>Spring 事务的隔离级别</h3><p>Spring 事务的隔离级别在 <code>TransactionDefinition</code> 中定义</p>
+<ul>
+<li>ISOLATION_DEFAULT: 数据库默认<blockquote>
+<p>MySQL 默认是 <code>REPATABLE_READ</code><br>Oracle 默认是 <code>READ_COMMITED</code>  </p>
+</blockquote>
+</li>
+<li>ISOLATION_READ_UNCOMMITED: 读未提交</li>
+<li>ISOLATION_READ_COMMITED: 读已提交</li>
+<li>ISOLATION_REPATABLE_READ: 可重复读</li>
+<li>ISOLATION_SERIALIZABLE: 串行化</li>
+</ul>
+<h3 id="Spring-事务的传播类型"><a href="#Spring-事务的传播类型" class="headerlink" title="Spring 事务的传播类型"></a>Spring 事务的传播类型</h3><p><strong>支持当前事务</strong>  </p>
+<ul>
+<li>PROPAGATION_REQUIRED: 如果当前存在事务则加入，不存在则新建</li>
+<li>PROPAGATION_SUPPORTS: 如果当前存在事务则加入，不存在则以非事务方式运行</li>
+<li>PROPAGATION_MANDATORY: 如果当前存在事务则加入，不存在则抛异常</li>
+</ul>
+<p><strong>不支持当前事务</strong>  </p>
+<ul>
+<li>PROPAGATION_REQUIRES_NEW: 新建一个事务，如果当前存在事务则挂起</li>
+<li>PROPAGATION_NOT_SUPPORTED: 以非事务方式运行，如果当前存在事务则挂起</li>
+<li>PROPAGATION_NEVER: 以非事务方式运行，如果当前存在事务则抛异常</li>
+</ul>
+<p><strong>其他情况</strong>  </p>
+<ul>
+<li>PROPAGATION_NESTED: 如果当前存在事务，则新建一个嵌套事务运行，不存在则新建一个事务  </li>
+</ul>
+<h3 id="事务回滚"><a href="#事务回滚" class="headerlink" title="事务回滚"></a>事务回滚</h3><p>当在注解或者XML文件中配置了 <code>rollbackFor=Exception.class</code> 属性，则当抛出 <code>Exception</code> 异常或其子类异常时会回滚事务<br>如果没有配置，则默认是 <code>rollbackFor=RuntimeException.class</code></p>
+<h3 id="Spring-事务失效"><a href="#Spring-事务失效" class="headerlink" title="Spring 事务失效"></a>Spring 事务失效</h3><p>因为 Spring 事务是基于AOP实现的，因此在 AOP 失效的场景下 Spring AOP 失效的场景下会失效。<br>除此以外还有以下几种情况：  </p>
+<ol>
+<li>未配置事务管理器</li>
+<li>定义在非 public 方法上<blockquote>
+<p><code>@Transactinal</code> 注解只支持 public 方法<br>如果要在非 public 方法上使用注解，需要将代理模式改成 aspectj</p>
+</blockquote>
+</li>
+<li>数据库不支持</li>
+<li>异常被吃掉了</li>
+<li>异常类型错误</li>
+</ol>
+<h2 id="Netty"><a href="#Netty" class="headerlink" title="Netty"></a>Netty</h2><h3 id="BIO、NIO、AIO-的区别"><a href="#BIO、NIO、AIO-的区别" class="headerlink" title="BIO、NIO、AIO 的区别"></a>BIO、NIO、AIO 的区别</h3><ul>
+<li>BIO: 阻塞IO，数据的读取写入必须阻塞在一个线程内，等待其完成</li>
+<li>NIO: 非阻塞IO，同步非阻塞的IO模型，提供 <code>Channel</code>, <code>Selector</code>, <code>Buffer</code> 等抽象</li>
+<li>AIO: 异步IO，基于事件通知和回调机制实现  </li>
+</ul>
+<h3 id="为什么要使用-Netty-而不是-Java-自带的-NIO-API"><a href="#为什么要使用-Netty-而不是-Java-自带的-NIO-API" class="headerlink" title="为什么要使用 Netty 而不是 Java 自带的 NIO API"></a>为什么要使用 Netty 而不是 Java 自带的 NIO API</h3><ol>
+<li>Netty 具有统一的 API，支持阻塞、非阻塞传输模型</li>
+<li>Netty 简单而强大的线程模型，比 Java 原生 NIO API 具有更高的吞吐量和更低的资源消耗</li>
+<li>自带编解码器解决 TCP 沾包 / 拆包问题</li>
+<li>原生支持多种协议栈</li>
+<li>真正支持无连接数据包套接字（UDP）支持</li>
+<li>有完整的 SSL/TLS 和 StartTLS 支持</li>
+</ol>
+<h3 id="Netty-的应用场景"><a href="#Netty-的应用场景" class="headerlink" title="Netty 的应用场景"></a>Netty 的应用场景</h3><ul>
+<li>HTTP 服务器</li>
+<li>RPC 框架的网络通信工具</li>
+<li>即时聊天系统</li>
+<li>消息推送系统</li>
+</ul>
+<h3 id="Netty-的核心组件"><a href="#Netty-的核心组件" class="headerlink" title="Netty 的核心组件"></a>Netty 的核心组件</h3><ul>
+<li><strong>ByteBuf</strong>: 字节容器<blockquote>
+<p>可以看作对 Java NIO 提供的 ByteBuffer 的抽象</p>
+</blockquote>
+</li>
+<li><strong>Boostrap</strong>: 客户端启动引导类</li>
+<li><strong>ServerBootstrap</strong>: 服务端启动引导类</li>
+<li><strong>Channel</strong>: 网络操作抽象类<blockquote>
+<p>通过 Channel 可以进行 IO 操作，一旦建立连接，就会创建一个 Channel 与该客户端绑定</p>
+</blockquote>
+</li>
+<li><strong>EventLoop</strong>: 事件循环<blockquote>
+<p>用于处理连接生命周期中所发生的事件<br>监听网络事件，并调用事件处理器进行相关的IO操作  </p>
+</blockquote>
+</li>
+<li><strong>EventLoopGroup</strong>: 包含多个 <code>EventLoop</code>，为每个 <code>Channel</code> 分配一个 <code>EventLoop</code>  </li>
+<li><strong>ChannelHandler</strong>: 消息处理器<blockquote>
+<p>具体的消息处理器，主要负责处理接收和发送的数据</p>
+</blockquote>
+</li>
+<li><strong>ChannelPipline</strong>: 消息对象链表<blockquote>
+<p>通过 <code>ChannelHandlerContext</code> 来间接管理 <code>ChannelHandler</code>  </p>
+</blockquote>
+</li>
+<li><strong>ChannelFuture</strong>: 操作执行结果<blockquote>
+<p>NIO 所有的IO操作都是异步的，可以通过 <code>ChannelFuture</code> 接口的 <code>addListener()</code> 方法注册一个 <code>ChannelFutureListener</code>，当操作执行成功或失败时会自动触发回调。<br>可以通过 <code>ChannelFuture</code> 的 <code>channel()</code> 方法获取相关联的 <code>Channel</code><br>可以通过 <code>ChannelFuture</code> 的 <code>sync()</code> 方法将异步编程同步化  </p>
+</blockquote>
+</li>
+</ul>
+<h3 id="对-Bootstrap-和-ServerBootstrap-的了解"><a href="#对-Bootstrap-和-ServerBootstrap-的了解" class="headerlink" title="对 Bootstrap 和 ServerBootstrap 的了解"></a>对 Bootstrap 和 ServerBootstrap 的了解</h3><ul>
+<li>Bootstrap:<blockquote>
+<p>需要分配一个 <code>EventLoopGroup</code><br>通过 <code>connect()</code> 方法连接服务端，也能使用 <code>bind()</code> 方法绑定本地端口作为 UDP 通信的一段</p>
+</blockquote>
+</li>
+<li>ServerBootstrap<blockquote>
+<p>需要分配两个 <code>EventLoopGroup</code>，一个用于连接，一个用于具体的处理<br>通过 <code>bind()</code> 方法绑定本地端口作为服务端</p>
+</blockquote>
+</li>
+</ul>
+<h3 id="NioEventLoopGroup-默认线程数"><a href="#NioEventLoopGroup-默认线程数" class="headerlink" title="NioEventLoopGroup 默认线程数"></a>NioEventLoopGroup 默认线程数</h3><p><code>NioEventLoopGroup</code> 无参构造方法线程数为0，最终调用到父类  <code>MultithreadEventExecutorGroup</code> 的下面这个构造方法  </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> <span class="title">MultithreadEventLoopGroup</span><span class="params">(<span class="keyword">int</span> nThreads, Executor executor, Object... args)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">super</span>(nThreads == <span class="number">0</span> ? DEFAULT_EVENT_LOOP_THREADS : nThreads, executor, args);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>DEFAULT_EVENT_LOOP_THREADS</code> 是在一个静态变量，初始化代码如下：  </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> DEFAULT_EVENT_LOOP_THREADS = Math.max(<span class="number">1</span>, SystemPropertyUtil.getInt(<span class="string">&quot;io.netty.eventLoopThreads&quot;</span>, NettyRuntime.availableProcessors() * <span class="number">2</span>));</span><br></pre></td></tr></table></figure>
+<p>可以看出默认线程数按照以下规则获取</p>
+<ol>
+<li>获取环境变量中的 <code>io.netty.eventLoopThreads</code></li>
+<li>如果没获取到则取 CUP核心数*2</li>
+<li>如果上面两步获取到的线程数小于1，则取1</li>
+</ol>
+<h3 id="Netty-线程模型"><a href="#Netty-线程模型" class="headerlink" title="Netty 线程模型"></a>Netty 线程模型</h3><ul>
+<li>单线程模型：Acceptor线程和worker线程是同一个线程</li>
+<li>多线程模型：一个Acceptor线程负责接受连接，多个worker线程负责读取/写入数据和处理具体的逻辑</li>
+<li>主从多线程模型：多个Acceptor线程负责接受连接，将连接绑定到一个worker线程</li>
+</ul>
+<h3 id="Netty-初始化流程"><a href="#Netty-初始化流程" class="headerlink" title="Netty 初始化流程"></a>Netty 初始化流程</h3><p><strong>服务端</strong>：</p>
+<ol>
+<li>创建两个 <code>EventLoopGroup</code>, bossGroup 和 workerGroup</li>
+<li>实例化 <code>ServerBootstrap</code></li>
+<li>调用 <code>ServerBootstrap.group()</code> 方法指定线程组</li>
+<li>调用 <code>ServerBootstrap.channel()</code> 方法指定 IO 模型</li>
+<li>调用 <code>ServerBootstrap.childHandler()</code> 方法指定工作线程的 handler 链，此处是创建了一个 <code>ChannelInitializer</code> 对象用于初始化 ChannelHandler 链 </li>
+<li>调用 <code>ServerBootstrap.bind()</code> 方法绑定本地端口，返回一个 <code>ChannelFuture</code></li>
+<li>可以调用 <code>ChannelFuture.sync()</code> 将异步转成同步，获取一个 <code>ChannelFuture</code></li>
+<li>调用 <code>ChannelFuture.channel().closeFuture().sync()</code> 可以同步监听 Channel 关闭事件</li>
+</ol>
+<p><strong>客户端</strong>：<br>与服务端初始化类似</p>
+<ol>
+<li>创建一个 <code>EventLoopGroup</code>, workerGroup</li>
+<li>实例化 <code>Bootstrap</code></li>
+<li>调用 <code>Bootstrap.group()</code> 方法指定线程组</li>
+<li>调用 <code>Bootstrap.channel()</code> 方法指定 IO 模型</li>
+<li>调用 <code>Bootstrap.handler()</code> 方法指定工作线程的 handler 链，此处是创建了一个 <code>ChannelInitializer</code> 对象用于初始化 ChannelHandler 链 </li>
+<li>调用 <code>Bootstrap.connect()</code> 方法连接服务端，返回一个 <code>ChannelFuture</code></li>
+<li>可以调用 <code>ChannelPromise.sync()</code> 将异步转成同步，获取一个 <code>ChannelFuture</code></li>
+<li>调用 <code>ChannelFuture.channel().closeFuture().sync()</code> 可以同步监听 Channel 关闭事件</li>
+</ol>
+<h3 id="Netty-解决-TCP-沾包-拆包"><a href="#Netty-解决-TCP-沾包-拆包" class="headerlink" title="Netty 解决 TCP 沾包/拆包"></a>Netty 解决 TCP 沾包/拆包</h3><p><strong>为什么会出现 TCP 沾包/拆包</strong><br>TCP 是无界的数据流，<br>发送端将需要发送的数据发送到缓冲区，当缓冲区满的时候数据包才会真正被发送出去，同理接收端也是等待缓冲区满后才会读取数据。<br>当发送的数据大于缓冲区大小时，就会出现缓冲区中只有一部分数据，即发生了<strong>拆包</strong><br>当发送的数据小于缓冲区大小时，缓冲区中可能包含多个数据包的数据，即发生了<strong>沾包</strong></p>
+<p><strong>WebSocket</strong><br>WebSocket 是根据 RCF6455 规范实现的。<br>每次发送或者接收的帧报文中，都会有定义协议的一些信息，例如头部大小，数据大小，以及帧类型，标识位等信息。<br>WebSocket 的出现可以认为是专门为了解决沾包 / 拆包问题</p>
+<p><strong>Netty 解决沾包 / 拆包问题</strong><br>Netty 中使用了多种 Decoder 解决沾包拆包问题</p>
+<ul>
+<li>LineBasedFrameDecoder: 发送数据包时以换行符作为分隔  </li>
+<li>DelimiterBasedFrameDecoder: 自定义分隔符  </li>
+<li>FixedLengthFrameDecoder: 固定长度解码器</li>
+<li>LengthFieldFrameDecoder: 包含数据包长度字段的解码器  </li>
+</ul>
+<p>自定义解码器<br>如使用 Protostuff, Hession2, json 序列化<br>专门针对 Java 语言的：Kryo，FST 等<br>跨语言的：Protostuff（基于 protobuf 发展而来），ProtoBuf，Thrift，Avro，MsgPack 等  </p>
+<h3 id="Netty-长连接和心跳机制"><a href="#Netty-长连接和心跳机制" class="headerlink" title="Netty 长连接和心跳机制"></a>Netty 长连接和心跳机制</h3><p><strong>长连接</strong></p>
+<ul>
+<li>短连接：建立连接发送完数据后关闭连接</li>
+<li>长连接：建立连接发送完数据后继续保持连接，后续的读写操作可以继续使用这个连接，省去TCP建立连接的资源消耗，适用于需要频繁建立连接的场景</li>
+</ul>
+<p><strong>心跳机制</strong><br>在没有心跳机制的情况下，客户端和服务端之间没有一段时间没有发送数据时，无法感知对方是否已经掉线<br>使用心跳机制，当客户端和服务端一段时间没有交互，既处于idle状态时，客户端发送一个特殊的报文给服务端，服务端接收到报文后立即返回一个特殊的报文，此既一个 PING-PONG 交互，以此来确保TCP连接的有效性<br>TCP 协议自带有长连接机制，即 TCP的 SO_KEEPALIVE 选项，但是不够灵活，因此一般都是在应用层协议上实现自定义心跳机制<br>Netty 中心跳机制的核心类时: <code>IdleStateHandler</code></p>
+<h3 id="Netty-的零拷贝问题"><a href="#Netty-的零拷贝问题" class="headerlink" title="Netty 的零拷贝问题"></a>Netty 的零拷贝问题</h3><ol>
+<li>使用 Netty 提供的 <code>CompositeByteBuf</code> 类，可以将多个 <code>ByteBuf</code> 类合并成一个逻辑上的 <code>ByteBuf</code>，避免 <code>ByteBuf</code> 间的拷贝  </li>
+<li><code>ByteBuf</code> 支持 slice 操作，因此可以将 <code>ByteBuf</code> 分解成多个共享同一存储区域的 <code>ByteBuf</code> 避免了内存拷贝</li>
+<li>通过 <code>FileRegion</code> 包装的 <code>FileRegion.transferTo</code> 实现文件传输，可以直接将文件缓冲区的数据发送到目标 <code>Channel</code>，避免了通过while循环方式导致的内存拷贝问题。  </li>
+</ol>
+</div><div class="article-licensing box"><div class="licensing-title"><p>学习笔记 2020-11-16</p><p><a href="https://blog.fansy.cloud/2020/11/16/note-2020-11-16/">https://blog.fansy.cloud/2020/11/16/note-2020-11-16/</a></p></div><div class="licensing-meta level is-mobile"><div class="level-left"><div class="level-item is-narrow"><div><h6>作者</h6><p>Cheney</p></div></div><div class="level-item is-narrow"><div><h6>发布于</h6><p>2020-11-16</p></div></div><div class="level-item is-narrow"><div><h6>更新于</h6><p>2020-11-16</p></div></div><div class="level-item is-narrow"><div><h6>许可协议</h6><p><a class="icon" rel="noopener" target="_blank" title="Creative Commons" href="https://creativecommons.org/"><i class="fab fa-creative-commons"></i></a><a class="icon" rel="noopener" target="_blank" title="Attribution" href="https://creativecommons.org/licenses/by/4.0/"><i class="fab fa-creative-commons-by"></i></a><a class="icon" rel="noopener" target="_blank" title="Noncommercial" href="https://creativecommons.org/licenses/by-nc/4.0/"><i class="fab fa-creative-commons-nc"></i></a></p></div></div></div></div></div><div class="article-tags is-size-7 mb-4"><span class="mr-2">#</span><a class="link-muted mr-2" rel="tag" href="/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a><a class="link-muted mr-2" rel="tag" href="/tags/Spring/">Spring</a></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js@1.0.16/dist/css/share.min.css"><div class="social-share"></div><script src="https://cdn.jsdelivr.net/npm/social-share.js@1.0.16/dist/js/social-share.min.js"></script></article></div><!--!--><nav class="post-navigation mt-4 level is-mobile"><div class="level-start"><a class="article-nav-prev level level-item link-muted" href="/2020/11/16/note-2020-11-02/"><i class="level-item fas fa-chevron-left"></i><span class="level-item">学习笔记 2020-11-02</span></a></div><div class="level-end"><a class="article-nav-next level level-item link-muted" href="/2020/11/13/note-2020-11-13/"><span class="level-item">学习笔记 2020-11-13</span><i class="level-item fas fa-chevron-right"></i></a></div></nav><div class="card"><div class="card-content"><h3 class="title is-5">评论</h3><div id="SOHUCS" sid="2020/11/16/note-2020-11-16/"></div><script charset="utf-8" src="https://changyan.sohu.com/upload/changyan.js"></script><script>window.changyan.api.config({appid: 'cyv85labh',conf: 'prod_9b6d4f256ee3263a05ac47edf3854a78'});</script></div></div></div><div class="column column-left is-4-tablet is-4-desktop is-3-widescreen  order-1"><div class="card widget" data-type="profile"><div class="card-content"><nav class="level"><div class="level-item has-text-centered flex-shrink-1"><div><figure class="image is-128x128 mx-auto mb-2"><img class="avatar" src="/img/avatar.png" alt="Cheney"></figure><p class="title is-size-4 is-block" style="line-height:inherit;">Cheney</p><p class="is-size-6 is-block">A Coder</p><p class="is-size-6 is-flex justify-content-center"><i class="fas fa-map-marker-alt mr-1"></i><span>China</span></p></div></div></nav><nav class="level is-mobile"><div class="level-item has-text-centered is-marginless"><div><p class="heading">文章</p><a href="/archives"><p class="title">15</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">分类</p><a href="/categories"><p class="title">4</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">标签</p><a href="/tags"><p class="title">14</p></a></div></div></nav><div class="level"><a class="level-item button is-primary is-rounded" href="https://github.com/fansys" target="_blank" rel="noopener">关注我</a></div><div class="level is-mobile"><a class="level-item button is-transparent is-marginless" target="_blank" rel="noopener" title="Github" href="https://github.com/fansys"><i class="fab fa-github"></i></a><a class="level-item button is-transparent is-marginless" target="_blank" rel="noopener" title="RSS" href="/"><i class="fas fa-rss"></i></a></div></div></div><div class="card widget" id="toc" data-type="toc"><div class="card-content"><div class="menu"><h3 class="menu-label">目录</h3><ul class="menu-list"><li><a class="level is-mobile" href="#Spring"><span class="level-left"><span class="level-item">1</span><span class="level-item">Spring</span></span></a><ul class="menu-list"><li><a class="level is-mobile" href="#Spring-特征"><span class="level-left"><span class="level-item">1.1</span><span class="level-item">Spring 特征</span></span></a></li><li><a class="level is-mobile" href="#Spring-模块"><span class="level-left"><span class="level-item">1.2</span><span class="level-item">Spring 模块</span></span></a></li><li><a class="level is-mobile" href="#对-Spring-的-IoC-和-AOP-的理解"><span class="level-left"><span class="level-item">1.3</span><span class="level-item">对 Spring 的 IoC 和 AOP 的理解</span></span></a></li><li><a class="level is-mobile" href="#Spring-Bean-的作用域"><span class="level-left"><span class="level-item">1.4</span><span class="level-item">Spring Bean 的作用域</span></span></a></li><li><a class="level is-mobile" href="#Spring-Bean的生命周期"><span class="level-left"><span class="level-item">1.5</span><span class="level-item">Spring Bean的生命周期</span></span></a></li></ul></li><li><a class="level is-mobile" href="#Spring-MVC"><span class="level-left"><span class="level-item">2</span><span class="level-item">Spring MVC</span></span></a><ul class="menu-list"><li><a class="level is-mobile" href="#对于-Sping-MVC-的理解"><span class="level-left"><span class="level-item">2.1</span><span class="level-item">对于 Sping MVC 的理解</span></span></a></li><li><a class="level is-mobile" href="#Spring-MVC-工作原理"><span class="level-left"><span class="level-item">2.2</span><span class="level-item">Spring MVC 工作原理</span></span></a></li></ul></li><li><a class="level is-mobile" href="#Spring-事务"><span class="level-left"><span class="level-item">3</span><span class="level-item">Spring 事务</span></span></a><ul class="menu-list"><li><a class="level is-mobile" href="#Spring-事务简介"><span class="level-left"><span class="level-item">3.1</span><span class="level-item">Spring 事务简介</span></span></a></li><li><a class="level is-mobile" href="#Spring-事务的隔离级别"><span class="level-left"><span class="level-item">3.2</span><span class="level-item">Spring 事务的隔离级别</span></span></a></li><li><a class="level is-mobile" href="#Spring-事务的传播类型"><span class="level-left"><span class="level-item">3.3</span><span class="level-item">Spring 事务的传播类型</span></span></a></li><li><a class="level is-mobile" href="#事务回滚"><span class="level-left"><span class="level-item">3.4</span><span class="level-item">事务回滚</span></span></a></li><li><a class="level is-mobile" href="#Spring-事务失效"><span class="level-left"><span class="level-item">3.5</span><span class="level-item">Spring 事务失效</span></span></a></li></ul></li><li><a class="level is-mobile" href="#Netty"><span class="level-left"><span class="level-item">4</span><span class="level-item">Netty</span></span></a><ul class="menu-list"><li><a class="level is-mobile" href="#BIO、NIO、AIO-的区别"><span class="level-left"><span class="level-item">4.1</span><span class="level-item">BIO、NIO、AIO 的区别</span></span></a></li><li><a class="level is-mobile" href="#为什么要使用-Netty-而不是-Java-自带的-NIO-API"><span class="level-left"><span class="level-item">4.2</span><span class="level-item">为什么要使用 Netty 而不是 Java 自带的 NIO API</span></span></a></li><li><a class="level is-mobile" href="#Netty-的应用场景"><span class="level-left"><span class="level-item">4.3</span><span class="level-item">Netty 的应用场景</span></span></a></li><li><a class="level is-mobile" href="#Netty-的核心组件"><span class="level-left"><span class="level-item">4.4</span><span class="level-item">Netty 的核心组件</span></span></a></li><li><a class="level is-mobile" href="#对-Bootstrap-和-ServerBootstrap-的了解"><span class="level-left"><span class="level-item">4.5</span><span class="level-item">对 Bootstrap 和 ServerBootstrap 的了解</span></span></a></li><li><a class="level is-mobile" href="#NioEventLoopGroup-默认线程数"><span class="level-left"><span class="level-item">4.6</span><span class="level-item">NioEventLoopGroup 默认线程数</span></span></a></li><li><a class="level is-mobile" href="#Netty-线程模型"><span class="level-left"><span class="level-item">4.7</span><span class="level-item">Netty 线程模型</span></span></a></li><li><a class="level is-mobile" href="#Netty-初始化流程"><span class="level-left"><span class="level-item">4.8</span><span class="level-item">Netty 初始化流程</span></span></a></li><li><a class="level is-mobile" href="#Netty-解决-TCP-沾包-拆包"><span class="level-left"><span class="level-item">4.9</span><span class="level-item">Netty 解决 TCP 沾包/拆包</span></span></a></li><li><a class="level is-mobile" href="#Netty-长连接和心跳机制"><span class="level-left"><span class="level-item">4.10</span><span class="level-item">Netty 长连接和心跳机制</span></span></a></li><li><a class="level is-mobile" href="#Netty-的零拷贝问题"><span class="level-left"><span class="level-item">4.11</span><span class="level-item">Netty 的零拷贝问题</span></span></a></li></ul></li></ul></div></div><style>.menu-list > li > a.is-active + .menu-list { display: block; }.menu-list > li > a + .menu-list { display: none; }</style><script src="/js/toc.js" defer></script></div><div class="card widget" data-type="links"><div class="card-content"><div class="menu"><h3 class="menu-label">链接</h3><ul class="menu-list"><li><a class="level is-mobile" href="https://gitee.com/fansys" target="_blank" rel="noopener"><span class="level-left"><span class="level-item">Gitee</span></span><span class="level-right"><span class="level-item tag">gitee.com</span></span></a></li><li><a class="level is-mobile" href="https://github.com/fansys" target="_blank" rel="noopener"><span class="level-left"><span class="level-item">Github</span></span><span class="level-right"><span class="level-item tag">github.com</span></span></a></li></ul></div></div></div><div class="card widget" data-type="categories"><div class="card-content"><div class="menu"><h3 class="menu-label">分类</h3><ul class="menu-list"><li><a class="level is-mobile" href="/categories/Java/"><span class="level-start"><span class="level-item">Java</span></span><span class="level-end"><span class="level-item tag">2</span></span></a></li><li><a class="level is-mobile" href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><span class="level-start"><span class="level-item">学习笔记</span></span><span class="level-end"><span class="level-item tag">9</span></span></a></li><li><a class="level is-mobile" href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/"><span class="level-start"><span class="level-item">数据结构</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/categories/%E7%AE%97%E6%B3%95/"><span class="level-start"><span class="level-item">算法</span></span><span class="level-end"><span class="level-item tag">3</span></span></a></li></ul></div></div></div><div class="card widget" data-type="subscribe-email"><div class="card-content"><div class="menu"><h3 class="menu-label">订阅更新</h3><form action="https://feedburner.google.com/fb/a/mailverify" method="post" target="popupwindow" onsubmit="window.open(&#039;https://feedburner.google.com/fb/a/mailverify?uri=&#039;,&#039;popupwindow&#039;,&#039;scrollbars=yes,width=550,height=520&#039;);return true"><input type="hidden" value="" name="uri"><input type="hidden" name="loc" value="en_US"><div class="field has-addons"><div class="control has-icons-left is-expanded"><input class="input" name="email" type="email" placeholder="Email"><span class="icon is-small is-left"><i class="fas fa-envelope"></i></span></div><div class="control"><input class="button" type="submit" value="订阅"></div></div></form></div></div></div><div class="column-right-shadow is-hidden-widescreen is-sticky"></div><div id="left-end"></div></div><div class="column column-right is-4-tablet is-4-desktop is-3-widescreen is-hidden-touch is-hidden-desktop-only order-3 is-sticky"><div class="card widget" data-type="recent-posts"><div class="card-content"><h3 class="menu-label">最新文章</h3><article class="media"><div class="media-content"><p class="date"><time dateTime="2020-11-16T13:26:19.453Z">2020-11-16</time></p><p class="title"><a href="/2020/11/16/note-2020-11-02/">学习笔记 2020-11-02</a></p><p class="categories"><a href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2020-11-16T06:08:13.000Z">2020-11-16</time></p><p class="title"><a href="/2020/11/16/note-2020-11-16/">学习笔记 2020-11-16</a></p><p class="categories"><a href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2020-11-13T09:06:52.000Z">2020-11-13</time></p><p class="title"><a href="/2020/11/13/note-2020-11-13/">学习笔记 2020-11-13</a></p><p class="categories"><a href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2020-11-12T08:42:48.000Z">2020-11-12</time></p><p class="title"><a href="/2020/11/12/note-2020-11-12/">学习笔记 2020-11-12</a></p><p class="categories"><a href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2020-11-11T02:57:25.000Z">2020-11-11</time></p><p class="title"><a href="/2020/11/11/note-2020-11-11/">学习笔记 2020-11-11</a></p><p class="categories"><a href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a></p></div></article></div></div><div class="card widget" data-type="archives"><div class="card-content"><div class="menu"><h3 class="menu-label">归档</h3><ul class="menu-list"><li><a class="level is-mobile" href="/archives/2020/11/"><span class="level-start"><span class="level-item">十一月 2020</span></span><span class="level-end"><span class="level-item tag">13</span></span></a></li><li><a class="level is-mobile" href="/archives/2020/10/"><span class="level-start"><span class="level-item">十月 2020</span></span><span class="level-end"><span class="level-item tag">2</span></span></a></li></ul></div></div></div><div class="card widget" data-type="tags"><div class="card-content"><div class="menu"><h3 class="menu-label">标签</h3><div class="field is-grouped is-grouped-multiline"><div class="control"><a class="tags has-addons" href="/tags/JVM/"><span class="tag">JVM</span><span class="tag">2</span></a></div><div class="control"><a class="tags has-addons" href="/tags/Java%E5%9F%BA%E7%A1%80/"><span class="tag">Java基础</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/Java%E7%BA%BF%E7%A8%8B/"><span class="tag">Java线程</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/Java%E9%9B%86%E5%90%88/"><span class="tag">Java集合</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/Spring/"><span class="tag">Spring</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/"><span class="tag">动态规划</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86/"><span class="tag">垃圾收集</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E5%AD%A6%E4%B9%A0/"><span class="tag">学习</span><span class="tag">2</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><span class="tag">学习笔记</span><span class="tag">4</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/"><span class="tag">数据库</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/"><span class="tag">数据结构</span><span class="tag">3</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E7%AE%97%E6%B3%95/"><span class="tag">算法</span><span class="tag">8</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E7%BC%93%E5%AD%98/"><span class="tag">缓存</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E8%B4%AA%E5%BF%83%E7%AE%97%E6%B3%95/"><span class="tag">贪心算法</span><span class="tag">1</span></a></div></div></div></div></div><div id="right-end"></div></div></div></div></section><footer class="footer"><div class="container"><div class="level"><div class="level-start"><a class="footer-logo is-block mb-2" href="/">Fansy&#039;s Blog</a><p class="is-size-7"><span>&copy; 2020 Cheney</span>  Powered by <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> &amp; <a href="https://github.com/ppoffice/hexo-theme-icarus" target="_blank" rel="noopener">Icarus</a></p></div><div class="level-end"><div class="field has-addons"><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Creative Commons" href="https://creativecommons.org/"><i class="fab fa-creative-commons"></i></a></p><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Attribution 4.0 International" href="https://creativecommons.org/licenses/by/4.0/"><i class="fab fa-creative-commons-by"></i></a></p></div></div></div></div></footer><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/moment@2.22.2/min/moment-with-locales.min.js"></script><script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.4/dist/clipboard.min.js" async></script><script>moment.locale("zh-CN");</script><script>var IcarusThemeSettings = {
+            article: {
+                highlight: {
+                    clipboard: true,
+                    fold: 'unfolded'
+                }
+            }
+        };</script><script src="/js/column.js"></script><script src="/js/animation.js"></script><a id="back-to-top" title="回到顶端" href="javascript:;"><i class="fas fa-chevron-up"></i></a><script src="/js/back_to_top.js" defer></script><!--!--><!--!--><!--!--><script src="https://cdn.jsdelivr.net/npm/lightgallery@1.6.8/dist/js/lightgallery.min.js" defer></script><script src="https://cdn.jsdelivr.net/npm/justifiedGallery@3.7.0/dist/js/jquery.justifiedGallery.min.js" defer></script><script>window.addEventListener("load", () => {
+            if (typeof $.fn.lightGallery === 'function') {
+                $('.article').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof $.fn.justifiedGallery === 'function') {
+                if ($('.justified-gallery > p > .gallery-item').length) {
+                    $('.justified-gallery > p > .gallery-item').unwrap();
+                }
+                $('.justified-gallery').justifiedGallery();
+            }
+        });</script><!--!--><!--!--><!--!--><!--!--><!--!--><script src="/js/main.js" defer></script><div class="searchbox"><div class="searchbox-container"><div class="searchbox-header"><div class="searchbox-input-container"><input class="searchbox-input" type="text" placeholder="想要查找什么..."></div><a class="searchbox-close" href="javascript:;">×</a></div><div class="searchbox-body"></div></div></div><script src="/js/insight.js" defer></script><script>document.addEventListener('DOMContentLoaded', function () {
+            loadInsight({"contentUrl":"/content.json"}, {"hint":"想要查找什么...","untitled":"(无标题)","posts":"文章","pages":"页面","categories":"分类","tags":"标签"});
+        });</script></body></html>
