@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="zh"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"><meta><title>简单了解 Zookeeper - Fansy&#039;s Blog</title><link rel="manifest" href="/manifest.json"><meta name="theme-color" content="#3273dc"><meta name="application-name" content="Fansy&#039;s Blog"><meta name="msapplication-TileImage" content="/img/favicon.svg"><meta name="msapplication-TileColor" content="#3273dc"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Fansy&#039;s Blog"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta description="本文简单介绍了一下 Zookeeper。    Zookeeper 的基本概念 Zookeeper 选举流程 常用的命令"><meta property="og:type" content="blog"><meta property="og:title" content="简单了解 Zookeeper"><meta property="og:url" content="https://blog.fansy.cloud/2020/11/17/zookeeper/"><meta property="og:site_name" content="Fansy&#039;s Blog"><meta property="og:description" content="本文简单介绍了一下 Zookeeper。    Zookeeper 的基本概念 Zookeeper 选举流程 常用的命令"><meta property="og:locale" content="zh_CN"><meta property="og:image" content="https://blog.fansy.cloud/img/og_image.png"><meta property="article:published_time" content="2020-11-17T13:52:59.000Z"><meta property="article:modified_time" content="2020-11-17T14:12:52.509Z"><meta property="article:author" content="Cheney"><meta property="article:tag" content="Zookeeper"><meta property="article:tag" content="分布式"><meta property="twitter:card" content="summary"><meta property="twitter:image" content="/img/og_image.png"><script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://blog.fansy.cloud/2020/11/17/zookeeper/"},"headline":"Fansy's Blog","image":["https://blog.fansy.cloud/img/og_image.png"],"datePublished":"2020-11-17T13:52:59.000Z","dateModified":"2020-11-17T14:12:52.509Z","author":{"@type":"Person","name":"Cheney"},"description":"本文简单介绍了一下 Zookeeper。    Zookeeper 的基本概念 Zookeeper 选举流程 常用的命令"}</script><link rel="canonical" href="https://blog.fansy.cloud/2020/11/17/zookeeper/"><link rel="icon" href="/img/favicon.svg"><link rel="stylesheet" href="https://cdn.bootcdn.net/ajax/libs/font-awesome/5.15.1/css/all.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@9.12.0/styles/atom-one-light.css"><link rel="stylesheet" href="https://fonts.loli.net/css2?family=Ubuntu:wght@400;600&amp;family=Source+Code+Pro"><link rel="stylesheet" href="/css/default.css"><style>body>.footer,body>.navbar,body>.section{opacity:0}</style><!--!--><!--!--><!--!--><!--!--><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@1.6.8/dist/css/lightgallery.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/justifiedGallery@3.7.0/dist/css/justifiedGallery.min.css"><!--!--><!--!--><script src="https://cdn.jsdelivr.net/npm/pace-js@1.0.2/pace.min.js"></script><!--!--><!--!--><meta name="generator" content="Hexo 5.2.0"></head><body class="is-3-column"><nav class="navbar navbar-main"><div class="container"><div class="navbar-brand justify-content-center"><a class="navbar-item navbar-logo" href="/">Fansy&#039;s Blog</a></div><div class="navbar-menu"><div class="navbar-start"><a class="navbar-item" href="/">首页</a><a class="navbar-item" href="/categories/">分类</a><a class="navbar-item" href="/archives/">归档</a><a class="navbar-item" href="/tags/">标签</a><a class="navbar-item" href="/about/">关于我</a></div><div class="navbar-end"><a class="navbar-item" target="_blank" rel="noopener" title="GitHub" href="https://gitee.com/fansys"><i class="fab fa-github"></i></a><a class="navbar-item is-hidden-tablet catalogue" title="目录" href="javascript:;"><i class="fas fa-list-ul"></i></a><a class="navbar-item search" title="搜索" href="javascript:;"><i class="fas fa-search"></i></a></div></div></div></nav><section class="section"><div class="container"><div class="columns"><div class="column order-2 column-main is-8-tablet is-8-desktop is-6-widescreen"><div class="card"><article class="card-content article" role="article"><div class="article-meta is-size-7 is-uppercase level is-mobile"><div class="level-left"><span class="level-item"><time dateTime="2020-11-17T13:52:59.000Z" title="2020-11-17T13:52:59.000Z">2020-11-17</time>发表</span><span class="level-item"><time dateTime="2020-11-17T14:12:52.509Z" title="2020-11-17T14:12:52.509Z">2020-11-17</time>更新</span><span class="level-item"><a class="link-muted" href="/categories/%E6%A1%86%E6%9E%B6/">框架</a></span><span class="level-item">21 分钟读完 (大约3212个字)</span></div></div><h1 class="title is-3 is-size-4-mobile">简单了解 Zookeeper</h1><div class="content"><p>本文简单介绍了一下 Zookeeper。  </p>
+<ul>
+<li>Zookeeper 的基本概念</li>
+<li>Zookeeper 选举流程</li>
+<li>常用的命令</li>
+</ul>
+<a id="more"></a>
+
+<h1 id="Zookeeper"><a href="#Zookeeper" class="headerlink" title="Zookeeper"></a>Zookeeper</h1><h2 id="Zookeeper-的作用"><a href="#Zookeeper-的作用" class="headerlink" title="Zookeeper 的作用"></a>Zookeeper 的作用</h2><p>Zookeeper 的使用场景：  </p>
+<ul>
+<li>集群管理：容错、负载均衡<blockquote>
+<p>如 Dubbo 使用 Zookeeper 实现集群的服务发现</p>
+</blockquote>
+</li>
+<li>配置文件的集中管理<blockquote>
+<p>如将集群的节点原信息放到 Zookeeper 的数据节点上</p>
+</blockquote>
+</li>
+<li>集群的入口  </li>
+</ul>
+<p>最常用的使用场景是用于担任服务生产者和消费者的注册中心（提供发布订阅服务），服务生产者将自己注册到 Zookeeper，消费者订阅Zookeeper 的节点获取服务提供者列表</p>
+<p>Zookeeper 集群需要有奇数个节点，原因是选举集群需要至少有 <code>n/2</code> 个节点投票选中 Leadeer<br><code>2n</code> 和 <code>2n-1</code> 个节点的容忍度都是 <code>n-1</code></p>
+<h2 id="Zookeeper-的数据模型"><a href="#Zookeeper-的数据模型" class="headerlink" title="Zookeeper 的数据模型"></a>Zookeeper 的数据模型</h2><h3 id="ZNode-数据节点-介绍"><a href="#ZNode-数据节点-介绍" class="headerlink" title="ZNode(数据节点) 介绍"></a>ZNode(数据节点) 介绍</h3><blockquote>
+<p>ZNode 是 Zookeeper 中数据的最小单位，每个 ZNode 都可以保存数据，同时还可以有子节点，类似于 Unix文件路径</p>
+</blockquote>
+<h3 id="ZNode-数据节点-结构"><a href="#ZNode-数据节点-结构" class="headerlink" title="ZNode(数据节点) 结构"></a>ZNode(数据节点) 结构</h3><p>每个 ZNode 由2部分组成：</p>
+<ul>
+<li>stat: 状态信息</li>
+<li>data: 数据内容</li>
+</ul>
+<p><strong>Stat 类</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">cZxid = 0x8  # 节点被创建时的事务ID</span><br><span class="line">ctime = Fri Sep 18 15:16:27 CST 2020 # 节点被创建时间</span><br><span class="line">mZxid = 0x8  # 节点最后一次被更新时的事务ID</span><br><span class="line">mtime = Fri Sep 18 15:16:27 CST 2020 # 节点最后一次被更新时间</span><br><span class="line">pZxid = 0x8  # 节点的【子节点列表】最后一次被修改的事务ID，</span><br><span class="line">cversion = 0 # 子节点的版本号</span><br><span class="line">dataVersion = 0 # 数据节点的版本号</span><br><span class="line">aclVersion = 0  # 节点的ACL版本号</span><br><span class="line">ephemeralOwner = 0x0 # 创建该临时节点的会话的 sessionID</span><br><span class="line">dataLength = 14 # 数据内容的长度</span><br><span class="line">numChildren = 0 # 节点的子节点个数</span><br></pre></td></tr></table></figure>
+
+<h2 id="Zookeeper-的一些概念"><a href="#Zookeeper-的一些概念" class="headerlink" title="Zookeeper 的一些概念"></a>Zookeeper 的一些概念</h2><h3 id="重要概念总结"><a href="#重要概念总结" class="headerlink" title="重要概念总结"></a>重要概念总结</h3><ul>
+<li>Zookeeper 本身是一个分布式程序</li>
+<li>为了保证高可用，最好以集群方式部署 Zookeeper，保证集群大部分机器可用的情况下 Zookeeper 本身仍然可用</li>
+<li>Zookeeper 的数据保存在内存中，保证了高吞吐量和低延迟，但是不能保存大量配置数据</li>
+<li>Zookeeper 是高性能的，在读多写少的情况下性能很高，在写多的情况下因为需要同步服务器间的状态会影响到性能</li>
+<li>Zookeeper 有临时节点的概念，当创建节点的客户端保持活动时，瞬时节点就一直存在，当会话终止时，瞬时节点被删除。持久节点指的是一旦节点创建后除非主动移除，否则一直保存在 Zookeeper 上</li>
+</ul>
+<p>Zookeeper 底层其实只提供两个功能：管理（存储、读取）用户程序提交的数据；为用户程序提供数据节点监听的服务  </p>
+<h3 id="会话（Session）"><a href="#会话（Session）" class="headerlink" title="会话（Session）"></a>会话（Session）</h3><ol>
+<li>Session 指的是 Zookeeper 服务端与客户端的会话，当客户端与服务端建立起一个 TCP 长连接时，客户端会话的生命周期就开始了  </li>
+<li>客户端会话需要通过心跳机制保持会话的有效性，当超过 <code>sessionTimeout</code> 配置的时间没收到心跳包时，会话将失效（连接任意一台服务器发送心跳即可）  </li>
+<li>客户端会话创建前，服务端会为客户端分配一个<strong>全局唯一 sessionID</strong>，许多与会话有关的运行机制都是依赖于这个 sessionID 的  </li>
+</ol>
+<h3 id="ZNode"><a href="#ZNode" class="headerlink" title="ZNode"></a>ZNode</h3><p>ZNode 时 Zookeeper 中的数据存储单元，每个 ZNode 都可以有子节点，类似于 Unix 树结构；<br>ZNode 上会保存自己的数据内容，同时还会保存一系列属性信息；  </p>
+<ul>
+<li>永久节点被创建后除非主动移除，否则一直存在  </li>
+<li>临时节点当会话失效时就会销毁  </li>
+<li>SEQUENTIAL 属性可以让节点创建时自动在节点名后面追加一个整数数字，这种节点可以用来注册服务列表  </li>
+</ul>
+<h3 id="版本"><a href="#版本" class="headerlink" title="版本"></a>版本</h3><p>每个 ZNode 都会维护一个 Stat 数据，记录了</p>
+<ul>
+<li>dataVersion = 0 # 数据节点的版本号</li>
+<li>cversion = 0 # 子节点的版本号</li>
+<li>aclVersion = 0  # 节点的ACL版本号</li>
+</ul>
+<h3 id="Watcher"><a href="#Watcher" class="headerlink" title="Watcher"></a>Watcher</h3><p>事件监听器时 Zookeeper 中的一个重要特性，允许用户在指定的节点上注册 Watcher，当一些特定的事件触发时，服务端会将事件通知到感兴趣的客户端上，这是实现分布式协调服务的重要特性。  </p>
+<h3 id="ACL"><a href="#ACL" class="headerlink" title="ACL"></a>ACL</h3><p>Zookeeper 使用 ACL(AccessControlLists) 策略来进行权限控制，类似于Unix文件系统的权限控制。<br>Zookeeper 定义了如下5中权限：</p>
+<ul>
+<li>CREATE: 创建子节点权限</li>
+<li>READ: 获取节点数据和子节点列表权限</li>
+<li>WRITE: 更新节点数据权限</li>
+<li>DELETE: 删除子节点权限</li>
+<li>ADMIN: 设置节点 ACL 权限</li>
+</ul>
+<h2 id="Zookeeper-的角色"><a href="#Zookeeper-的角色" class="headerlink" title="Zookeeper 的角色"></a>Zookeeper 的角色</h2><h3 id="Leader-领导者"><a href="#Leader-领导者" class="headerlink" title="Leader: 领导者"></a>Leader: 领导者</h3><ul>
+<li>事务请求的唯一调度和处理者，保证集群事务处理的顺序性  </li>
+<li>集群内部各服务器的调度者  </li>
+</ul>
+<h3 id="Follower-跟随者"><a href="#Follower-跟随者" class="headerlink" title="Follower: 跟随者"></a>Follower: 跟随者</h3><ul>
+<li>处理客户端非事务请求，转发事务请求给Leader服务器</li>
+<li>参与事务请求Proposal的投票</li>
+<li>参与Leader选举的投票</li>
+</ul>
+<h3 id="Observer-观察者"><a href="#Observer-观察者" class="headerlink" title="Observer: 观察者"></a>Observer: 观察者</h3><ul>
+<li>处理客户端非事务请求，转发事务请求给Leader服务器</li>
+<li>相比于Follower的区别是不参与投票</li>
+</ul>
+<h2 id="Zookeeper-Leader-恢复模式"><a href="#Zookeeper-Leader-恢复模式" class="headerlink" title="Zookeeper Leader 恢复模式"></a>Zookeeper Leader 恢复模式</h2><ol>
+<li>Leader election(选举阶段): 节点在一开始都处于选举阶段，只要一个节点得到半数票数，就可以当选准Leader</li>
+<li>DIscovery(发现阶段): Followers 跟准Leader 进行通信，同步 Followers最近接收的事务提议</li>
+<li>Synchronization(同步阶段):  利用准Leader前一阶段获得的最新提议历史，同步集群中所有的副本，同步完成后准Leader才会成为真正的Leader</li>
+<li>Broadcadt(广播阶段): Zookeeper 集群正式对外提供服务，并且Leader可以进行消息广播，有新节点加入时，还需要对新节点进行同步。</li>
+</ol>
+<h2 id="ZAB协议-amp-Paxos算法"><a href="#ZAB协议-amp-Paxos算法" class="headerlink" title="ZAB协议&amp;Paxos算法"></a>ZAB协议&amp;Paxos算法</h2><h3 id="Zookeeper支持的选举算法"><a href="#Zookeeper支持的选举算法" class="headerlink" title="Zookeeper支持的选举算法"></a>Zookeeper支持的选举算法</h3><ul>
+<li>基于UDP的LeaderElection</li>
+<li>基于UDP的FastLeaderElection</li>
+<li>基于UDP和认证的FastLeaderElection</li>
+<li>基于TCP的FastLeaderElection</li>
+</ul>
+<h3 id="FastLeaderElection-原理"><a href="#FastLeaderElection-原理" class="headerlink" title="FastLeaderElection 原理"></a>FastLeaderElection 原理</h3><ol>
+<li><p><strong>myid</strong><br>每个 Zookeeper 服务器都需要在数据文件夹下创建一个名为 myid 的文件，该文件包含了整个 Zookeeper 集群唯一的ID(整数)<br>在配置文件中，其ID与hostname必须一一对应  </p>
+</li>
+<li><p><strong>zxid</strong><br>用于标识每一次更新操作的 Proposal ID，为了保证顺序性，zxid 必须单调递增<br>Zookeeper 使用64位的数来表示，高32位是Leader的epoch，从1开始，每次选出新的Leader，epoch加1；低32位为该epoch内的序号，每次epoch变化，都将低32位的序号重置，这样保证了zxid的全局递增性  </p>
+</li>
+<li><p><strong>服务器状态</strong></p>
+</li>
+</ol>
+<ul>
+<li>LOOKING: 不确定Leader状态，该状态下服务器认为集群中还没有Leader，会发起Leader选举</li>
+<li>FOLLOWING: 跟随者状态，标识当前服务器是跟随者，并且知道它的Leader是谁<ul>
+<li>LEADING: 领导者状态，标识当前服务器是Leader，它会维护与Follower的心跳</li>
+<li>OBSERVING: 观察者状态，标识当前服务器是观察者角色，不参与选举和集群写操作的投票  </li>
+</ul>
+</li>
+</ul>
+<ol start="4">
+<li><strong>选票数据结构</strong></li>
+</ol>
+<ul>
+<li>logicClock: 每个服务器会维护一个自增的整数，标识这是该服务器发起的第几轮投票</li>
+<li>state: 当前服务器状态</li>
+<li>self_id: 当前服务器的myid</li>
+<li>self_zxid: 当前服务器上所保存的最大的zxid</li>
+<li>vote_id: 被推举的服务器的myid</li>
+<li>vote_zxid: 被推举的服务器上所保存的最大的zxid  </li>
+</ul>
+<ol start="5">
+<li><strong>投票流程</strong></li>
+</ol>
+<ul>
+<li>自增选举序列<blockquote>
+<p>每次选举服务器都会对logicClock进行自增</p>
+</blockquote>
+</li>
+<li>初始化选票<blockquote>
+<p>清空票箱</p>
+</blockquote>
+</li>
+<li>发送初始选<blockquote>
+<p>每个服务器通过广播将选票投给自己</p>
+</blockquote>
+</li>
+<li>接收外部选票<blockquote>
+<p>服务器尝试送外部获取选票，并计入自己的票箱</p>
+</blockquote>
+</li>
+<li>判断选举轮次<blockquote>
+<p>外部选票的logicClock大于自己的logicClock，说明服务器的选举轮次落后于其他服务器，立即清空票箱，并将自己的logicClock更新为收到的logicClock<br>然后对比自己之前的投票与收到的选票以确定是否需要变更自己的投票，最终将自己的投票广播出去<br>外部投票logicClock小于自己的logicClock，则忽略；如果相等，则进行选票PK  </p>
+</blockquote>
+</li>
+<li>选票PK<blockquote>
+<p>基于(self_id, self_zxid)与(vote_id, vote_zxid)对比<br>如果logicClock一致，则对比zxid，更新为较大者，广播出去<br>如果zxid相同，则对比myid，更新为较大者，广播较大者的投票，并且广播出去<br>如果自己就是较大者则忽略。</p>
+</blockquote>
+</li>
+<li>统计选票<blockquote>
+<p>如果过半服务器认可自己的投票，则终止投票，否则继续接收其他服务器的投票</p>
+</blockquote>
+</li>
+<li>更新服务器状态<blockquote>
+<p>若过半投票投给了自己，则更新服务器状态为LEADING，否则更新状态为FOLLOWING  </p>
+</blockquote>
+</li>
+</ul>
+<ol start="6">
+<li><p><strong>集群启动领导选举</strong><br>按照投票流程投票，先投给自己，知道确定Leader  </p>
+</li>
+<li><p><strong>Follower 重启选举</strong><br>启动进入LOOKING状态，发起投票投给自己，集群服务器返回自己的状态和选票，Follower发现Leader服务器，将自己的状态更新为FOLLOWING</p>
+</li>
+<li><p><strong>Leader 重启选举</strong><br>发起投票，投票给自己，依据zxid和myid确定选票，选出新的Leader<br>旧的 Leader 恢复后，进入 LOOKING 状态并发起新一轮的领导选举，其他步骤遵循 Follower 重启选举</p>
+</li>
+</ol>
+<h3 id="Zookeeper-语义保证"><a href="#Zookeeper-语义保证" class="headerlink" title="Zookeeper 语义保证"></a>Zookeeper 语义保证</h3><ul>
+<li>顺序性：客户端发起的更新会按照顺序应用到 Zookeeper 上</li>
+<li>原子性：更新操作要么成功要么失败，不会出现中间状态</li>
+<li>单一系统镜像：一个客户端无论连接哪个服务器都会看到完全一样的系统镜像，写操作并不保证所有的 Follower 立即确认，因此通过 Follower 并不能保证读到最新的数据，如果一定要读取到最新的数据，读取之前可调用 sync() 方法  </li>
+<li>可靠性：一个更新操作一旦被接受即不会意外丢失，除非被其他更新操作覆盖</li>
+<li>最终一致性：写操作最终（而非立即）会对客户端可见</li>
+</ul>
+<h3 id="Zookeeper-Watch-机制"><a href="#Zookeeper-Watch-机制" class="headerlink" title="Zookeeper Watch 机制"></a>Zookeeper Watch 机制</h3><p>所有对 Zookeeper 的读操作，都可附带一个 Watch，一旦数据发生变化，该 Watch 即被触发<br>Watch 机制的特点：  </p>
+<ul>
+<li>主动通知：Watch 被处罚时，Zookeeper 服务器将主动推送更新给客户端</li>
+<li>一次性：Watch 只会被触发一次，如需再次触发需要重新注册 Watch</li>
+<li>可见性：Watch 通知收到前不可能看到更新后的数据，即 更新通知先于更新结果</li>
+<li>顺序性：如果多个更新触发了 Watch，那 Watch 被触发的顺序与更新顺序一致。</li>
+</ul>
+<h3 id="分布式锁与领导选举关键点"><a href="#分布式锁与领导选举关键点" class="headerlink" title="分布式锁与领导选举关键点"></a>分布式锁与领导选举关键点</h3><ul>
+<li>最多一个获取锁 / 成为 Leader</li>
+<li>锁重入 / 确认自己是 Leader</li>
+<li>释放锁 / 放弃领导权</li>
+<li>感知锁释放 / 领导权的放弃  </li>
+</ul>
+<h3 id="非公平领导选举"><a href="#非公平领导选举" class="headerlink" title="非公平领导选举"></a>非公平领导选举</h3><ul>
+<li>选主过程  <blockquote>
+<p>多个客户端同时向 Zookeeper 集群注册 Ephemeral 且 Non-Sequence 类型的节点，路径为同一路径，只有一个客户端能创建成功  </p>
+</blockquote>
+</li>
+<li>放弃领导权  <blockquote>
+<p>如果 Leader 进程宕机，则与之对应的 Session 也将结束，节点会自动删除，对于其他客户端而言 Leader 放弃了领导权</p>
+</blockquote>
+</li>
+<li>感知领导权的放弃  <blockquote>
+<p>创建节点失败的客户端除了成为 Follower 还会向同一路径注册 Watch，当 Leader 放弃领导权时，该节点被删除，所有的 Follower 会收到通知。  </p>
+</blockquote>
+</li>
+<li>重新选举<blockquote>
+<p>所有的 Follower 再次发起选主过程  </p>
+</blockquote>
+</li>
+</ul>
+<h3 id="公平领导选举"><a href="#公平领导选举" class="headerlink" title="公平领导选举"></a>公平领导选举</h3><p>相较于非公平领导选举，客户端创建 Sequence 节点，每个客户端向上一个 Sequence 节点注册 Watch，当第一个节点的客户端放弃领导权后，它的下一个节点对应客户端获得领导权  </p>
+<h2 id="Zookeeper-常用命令"><a href="#Zookeeper-常用命令" class="headerlink" title="Zookeeper 常用命令"></a>Zookeeper 常用命令</h2><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 连接节点</span></span><br><span class="line">./zkCli.sh -server 127.0.0.1:2181</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看帮助</span></span><br><span class="line"><span class="built_in">help</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建节点</span></span><br><span class="line">create /node <span class="string">&quot;node data&quot;</span></span><br><span class="line">create /node1/node2 123</span><br><span class="line"></span><br><span class="line"><span class="comment"># 更新节点</span></span><br><span class="line"><span class="built_in">set</span> /node1/node2 <span class="string">&quot;set node data&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 获取节点数据</span></span><br><span class="line">get /node1/node2</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看子节点</span></span><br><span class="line">ls /node1</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看节点状态</span></span><br><span class="line"><span class="built_in">stat</span> /node1</span><br><span class="line"></span><br><span class="line"><span class="comment"># 删除节点，删除的节点不能有子节点</span></span><br><span class="line">delete /node1</span><br></pre></td></tr></table></figure></div><div class="article-licensing box"><div class="licensing-title"><p>简单了解 Zookeeper</p><p><a href="https://blog.fansy.cloud/2020/11/17/zookeeper/">https://blog.fansy.cloud/2020/11/17/zookeeper/</a></p></div><div class="licensing-meta level is-mobile"><div class="level-left"><div class="level-item is-narrow"><div><h6>作者</h6><p>Cheney</p></div></div><div class="level-item is-narrow"><div><h6>发布于</h6><p>2020-11-17</p></div></div><div class="level-item is-narrow"><div><h6>更新于</h6><p>2020-11-17</p></div></div><div class="level-item is-narrow"><div><h6>许可协议</h6><p><a class="icon" rel="noopener" target="_blank" title="Creative Commons" href="https://creativecommons.org/"><i class="fab fa-creative-commons"></i></a><a class="icon" rel="noopener" target="_blank" title="Attribution" href="https://creativecommons.org/licenses/by/4.0/"><i class="fab fa-creative-commons-by"></i></a><a class="icon" rel="noopener" target="_blank" title="Noncommercial" href="https://creativecommons.org/licenses/by-nc/4.0/"><i class="fab fa-creative-commons-nc"></i></a></p></div></div></div></div></div><div class="article-tags is-size-7 mb-4"><span class="mr-2">#</span><a class="link-muted mr-2" rel="tag" href="/tags/Zookeeper/">Zookeeper</a><a class="link-muted mr-2" rel="tag" href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F/">分布式</a></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/social-share.js@1.0.16/dist/css/share.min.css"><div class="social-share"></div><script src="https://cdn.jsdelivr.net/npm/social-share.js@1.0.16/dist/js/social-share.min.js"></script></article></div><!--!--><nav class="post-navigation mt-4 level is-mobile"><div class="level-end"><a class="article-nav-next level level-item link-muted" href="/2020/11/17/note-2020-11-17/"><span class="level-item">学习笔记 2020-11-17</span><i class="level-item fas fa-chevron-right"></i></a></div></nav><div class="card"><div class="card-content"><h3 class="title is-5">评论</h3><div id="SOHUCS" sid="2020/11/17/zookeeper/"></div><script charset="utf-8" src="https://changyan.sohu.com/upload/changyan.js"></script><script>window.changyan.api.config({appid: 'cyv85labh',conf: 'prod_9b6d4f256ee3263a05ac47edf3854a78'});</script></div></div></div><div class="column column-left is-4-tablet is-4-desktop is-3-widescreen  order-1"><div class="card widget" data-type="profile"><div class="card-content"><nav class="level"><div class="level-item has-text-centered flex-shrink-1"><div><figure class="image is-128x128 mx-auto mb-2"><img class="avatar" src="/img/avatar.png" alt="Cheney"></figure><p class="title is-size-4 is-block" style="line-height:inherit;">Cheney</p><p class="is-size-6 is-block">A Coder</p><p class="is-size-6 is-flex justify-content-center"><i class="fas fa-map-marker-alt mr-1"></i><span>China</span></p></div></div></nav><nav class="level is-mobile"><div class="level-item has-text-centered is-marginless"><div><p class="heading">文章</p><a href="/archives"><p class="title">17</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">分类</p><a href="/categories"><p class="title">5</p></a></div></div><div class="level-item has-text-centered is-marginless"><div><p class="heading">标签</p><a href="/tags"><p class="title">16</p></a></div></div></nav><div class="level"><a class="level-item button is-primary is-rounded" href="https://github.com/fansys" target="_blank" rel="noopener">关注我</a></div><div class="level is-mobile"><a class="level-item button is-transparent is-marginless" target="_blank" rel="noopener" title="Github" href="https://github.com/fansys"><i class="fab fa-github"></i></a><a class="level-item button is-transparent is-marginless" target="_blank" rel="noopener" title="RSS" href="/"><i class="fas fa-rss"></i></a></div></div></div><div class="card widget" id="toc" data-type="toc"><div class="card-content"><div class="menu"><h3 class="menu-label">目录</h3><ul class="menu-list"><li><a class="level is-mobile" href="#Zookeeper"><span class="level-left"><span class="level-item">1</span><span class="level-item">Zookeeper</span></span></a><ul class="menu-list"><li><a class="level is-mobile" href="#Zookeeper-的作用"><span class="level-left"><span class="level-item">1.1</span><span class="level-item">Zookeeper 的作用</span></span></a></li><li><a class="level is-mobile" href="#Zookeeper-的数据模型"><span class="level-left"><span class="level-item">1.2</span><span class="level-item">Zookeeper 的数据模型</span></span></a><ul class="menu-list"><li><a class="level is-mobile" href="#ZNode-数据节点-介绍"><span class="level-left"><span class="level-item">1.2.1</span><span class="level-item">ZNode(数据节点) 介绍</span></span></a></li><li><a class="level is-mobile" href="#ZNode-数据节点-结构"><span class="level-left"><span class="level-item">1.2.2</span><span class="level-item">ZNode(数据节点) 结构</span></span></a></li></ul></li><li><a class="level is-mobile" href="#Zookeeper-的一些概念"><span class="level-left"><span class="level-item">1.3</span><span class="level-item">Zookeeper 的一些概念</span></span></a><ul class="menu-list"><li><a class="level is-mobile" href="#重要概念总结"><span class="level-left"><span class="level-item">1.3.1</span><span class="level-item">重要概念总结</span></span></a></li><li><a class="level is-mobile" href="#会话（Session）"><span class="level-left"><span class="level-item">1.3.2</span><span class="level-item">会话（Session）</span></span></a></li><li><a class="level is-mobile" href="#ZNode"><span class="level-left"><span class="level-item">1.3.3</span><span class="level-item">ZNode</span></span></a></li><li><a class="level is-mobile" href="#版本"><span class="level-left"><span class="level-item">1.3.4</span><span class="level-item">版本</span></span></a></li><li><a class="level is-mobile" href="#Watcher"><span class="level-left"><span class="level-item">1.3.5</span><span class="level-item">Watcher</span></span></a></li><li><a class="level is-mobile" href="#ACL"><span class="level-left"><span class="level-item">1.3.6</span><span class="level-item">ACL</span></span></a></li></ul></li><li><a class="level is-mobile" href="#Zookeeper-的角色"><span class="level-left"><span class="level-item">1.4</span><span class="level-item">Zookeeper 的角色</span></span></a><ul class="menu-list"><li><a class="level is-mobile" href="#Leader-领导者"><span class="level-left"><span class="level-item">1.4.1</span><span class="level-item">Leader: 领导者</span></span></a></li><li><a class="level is-mobile" href="#Follower-跟随者"><span class="level-left"><span class="level-item">1.4.2</span><span class="level-item">Follower: 跟随者</span></span></a></li><li><a class="level is-mobile" href="#Observer-观察者"><span class="level-left"><span class="level-item">1.4.3</span><span class="level-item">Observer: 观察者</span></span></a></li></ul></li><li><a class="level is-mobile" href="#Zookeeper-Leader-恢复模式"><span class="level-left"><span class="level-item">1.5</span><span class="level-item">Zookeeper Leader 恢复模式</span></span></a></li><li><a class="level is-mobile" href="#ZAB协议-amp-Paxos算法"><span class="level-left"><span class="level-item">1.6</span><span class="level-item">ZAB协议&amp;Paxos算法</span></span></a><ul class="menu-list"><li><a class="level is-mobile" href="#Zookeeper支持的选举算法"><span class="level-left"><span class="level-item">1.6.1</span><span class="level-item">Zookeeper支持的选举算法</span></span></a></li><li><a class="level is-mobile" href="#FastLeaderElection-原理"><span class="level-left"><span class="level-item">1.6.2</span><span class="level-item">FastLeaderElection 原理</span></span></a></li><li><a class="level is-mobile" href="#Zookeeper-语义保证"><span class="level-left"><span class="level-item">1.6.3</span><span class="level-item">Zookeeper 语义保证</span></span></a></li><li><a class="level is-mobile" href="#Zookeeper-Watch-机制"><span class="level-left"><span class="level-item">1.6.4</span><span class="level-item">Zookeeper Watch 机制</span></span></a></li><li><a class="level is-mobile" href="#分布式锁与领导选举关键点"><span class="level-left"><span class="level-item">1.6.5</span><span class="level-item">分布式锁与领导选举关键点</span></span></a></li><li><a class="level is-mobile" href="#非公平领导选举"><span class="level-left"><span class="level-item">1.6.6</span><span class="level-item">非公平领导选举</span></span></a></li><li><a class="level is-mobile" href="#公平领导选举"><span class="level-left"><span class="level-item">1.6.7</span><span class="level-item">公平领导选举</span></span></a></li></ul></li><li><a class="level is-mobile" href="#Zookeeper-常用命令"><span class="level-left"><span class="level-item">1.7</span><span class="level-item">Zookeeper 常用命令</span></span></a></li></ul></li></ul></div></div><style>.menu-list > li > a.is-active + .menu-list { display: block; }.menu-list > li > a + .menu-list { display: none; }</style><script src="/js/toc.js" defer></script></div><div class="card widget" data-type="links"><div class="card-content"><div class="menu"><h3 class="menu-label">链接</h3><ul class="menu-list"><li><a class="level is-mobile" href="https://gitee.com/fansys" target="_blank" rel="noopener"><span class="level-left"><span class="level-item">Gitee</span></span><span class="level-right"><span class="level-item tag">gitee.com</span></span></a></li><li><a class="level is-mobile" href="https://github.com/fansys" target="_blank" rel="noopener"><span class="level-left"><span class="level-item">Github</span></span><span class="level-right"><span class="level-item tag">github.com</span></span></a></li></ul></div></div></div><div class="card widget" data-type="categories"><div class="card-content"><div class="menu"><h3 class="menu-label">分类</h3><ul class="menu-list"><li><a class="level is-mobile" href="/categories/Java/"><span class="level-start"><span class="level-item">Java</span></span><span class="level-end"><span class="level-item tag">2</span></span></a></li><li><a class="level is-mobile" href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><span class="level-start"><span class="level-item">学习笔记</span></span><span class="level-end"><span class="level-item tag">10</span></span></a></li><li><a class="level is-mobile" href="/categories/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/"><span class="level-start"><span class="level-item">数据结构</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/categories/%E6%A1%86%E6%9E%B6/"><span class="level-start"><span class="level-item">框架</span></span><span class="level-end"><span class="level-item tag">1</span></span></a></li><li><a class="level is-mobile" href="/categories/%E7%AE%97%E6%B3%95/"><span class="level-start"><span class="level-item">算法</span></span><span class="level-end"><span class="level-item tag">3</span></span></a></li></ul></div></div></div><div class="card widget" data-type="subscribe-email"><div class="card-content"><div class="menu"><h3 class="menu-label">订阅更新</h3><form action="https://feedburner.google.com/fb/a/mailverify" method="post" target="popupwindow" onsubmit="window.open(&#039;https://feedburner.google.com/fb/a/mailverify?uri=&#039;,&#039;popupwindow&#039;,&#039;scrollbars=yes,width=550,height=520&#039;);return true"><input type="hidden" value="" name="uri"><input type="hidden" name="loc" value="en_US"><div class="field has-addons"><div class="control has-icons-left is-expanded"><input class="input" name="email" type="email" placeholder="Email"><span class="icon is-small is-left"><i class="fas fa-envelope"></i></span></div><div class="control"><input class="button" type="submit" value="订阅"></div></div></form></div></div></div><div class="column-right-shadow is-hidden-widescreen is-sticky"></div><div id="left-end"></div></div><div class="column column-right is-4-tablet is-4-desktop is-3-widescreen is-hidden-touch is-hidden-desktop-only order-3 is-sticky"><div class="card widget" data-type="recent-posts"><div class="card-content"><h3 class="menu-label">最新文章</h3><article class="media"><div class="media-content"><p class="date"><time dateTime="2020-11-17T13:52:59.000Z">2020-11-17</time></p><p class="title"><a href="/2020/11/17/zookeeper/">简单了解 Zookeeper</a></p><p class="categories"><a href="/categories/%E6%A1%86%E6%9E%B6/">框架</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2020-11-17T06:19:24.000Z">2020-11-17</time></p><p class="title"><a href="/2020/11/17/note-2020-11-17/">学习笔记 2020-11-17</a></p><p class="categories"><a href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2020-11-16T06:08:13.000Z">2020-11-16</time></p><p class="title"><a href="/2020/11/16/note-2020-11-16/">学习笔记 2020-11-16</a></p><p class="categories"><a href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2020-11-13T09:06:52.000Z">2020-11-13</time></p><p class="title"><a href="/2020/11/13/note-2020-11-13/">学习笔记 2020-11-13</a></p><p class="categories"><a href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a></p></div></article><article class="media"><div class="media-content"><p class="date"><time dateTime="2020-11-12T08:42:48.000Z">2020-11-12</time></p><p class="title"><a href="/2020/11/12/note-2020-11-12/">学习笔记 2020-11-12</a></p><p class="categories"><a href="/categories/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/">学习笔记</a></p></div></article></div></div><div class="card widget" data-type="archives"><div class="card-content"><div class="menu"><h3 class="menu-label">归档</h3><ul class="menu-list"><li><a class="level is-mobile" href="/archives/2020/11/"><span class="level-start"><span class="level-item">十一月 2020</span></span><span class="level-end"><span class="level-item tag">15</span></span></a></li><li><a class="level is-mobile" href="/archives/2020/10/"><span class="level-start"><span class="level-item">十月 2020</span></span><span class="level-end"><span class="level-item tag">2</span></span></a></li></ul></div></div></div><div class="card widget" data-type="tags"><div class="card-content"><div class="menu"><h3 class="menu-label">标签</h3><div class="field is-grouped is-grouped-multiline"><div class="control"><a class="tags has-addons" href="/tags/JVM/"><span class="tag">JVM</span><span class="tag">2</span></a></div><div class="control"><a class="tags has-addons" href="/tags/Java%E5%9F%BA%E7%A1%80/"><span class="tag">Java基础</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/Java%E7%BA%BF%E7%A8%8B/"><span class="tag">Java线程</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/Java%E9%9B%86%E5%90%88/"><span class="tag">Java集合</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/Spring/"><span class="tag">Spring</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/Zookeeper/"><span class="tag">Zookeeper</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E5%88%86%E5%B8%83%E5%BC%8F/"><span class="tag">分布式</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92/"><span class="tag">动态规划</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86/"><span class="tag">垃圾收集</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E5%AD%A6%E4%B9%A0/"><span class="tag">学习</span><span class="tag">2</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/"><span class="tag">学习笔记</span><span class="tag">5</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E6%95%B0%E6%8D%AE%E5%BA%93/"><span class="tag">数据库</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84/"><span class="tag">数据结构</span><span class="tag">3</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E7%AE%97%E6%B3%95/"><span class="tag">算法</span><span class="tag">8</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E7%BC%93%E5%AD%98/"><span class="tag">缓存</span><span class="tag">1</span></a></div><div class="control"><a class="tags has-addons" href="/tags/%E8%B4%AA%E5%BF%83%E7%AE%97%E6%B3%95/"><span class="tag">贪心算法</span><span class="tag">1</span></a></div></div></div></div></div><div id="right-end"></div></div></div></div></section><footer class="footer"><div class="container"><div class="level"><div class="level-start"><a class="footer-logo is-block mb-2" href="/">Fansy&#039;s Blog</a><p class="is-size-7"><span>&copy; 2020 Cheney</span>  Powered by <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> &amp; <a href="https://github.com/ppoffice/hexo-theme-icarus" target="_blank" rel="noopener">Icarus</a></p></div><div class="level-end"><div class="field has-addons"><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Creative Commons" href="https://creativecommons.org/"><i class="fab fa-creative-commons"></i></a></p><p class="control"><a class="button is-transparent is-large" target="_blank" rel="noopener" title="Attribution 4.0 International" href="https://creativecommons.org/licenses/by/4.0/"><i class="fab fa-creative-commons-by"></i></a></p></div></div></div></div></footer><script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/moment@2.22.2/min/moment-with-locales.min.js"></script><script src="https://cdn.jsdelivr.net/npm/clipboard@2.0.4/dist/clipboard.min.js" async></script><script>moment.locale("zh-CN");</script><script>var IcarusThemeSettings = {
+            article: {
+                highlight: {
+                    clipboard: true,
+                    fold: 'unfolded'
+                }
+            }
+        };</script><script src="/js/column.js"></script><script src="/js/animation.js"></script><a id="back-to-top" title="回到顶端" href="javascript:;"><i class="fas fa-chevron-up"></i></a><script src="/js/back_to_top.js" defer></script><!--!--><!--!--><!--!--><script src="https://cdn.jsdelivr.net/npm/lightgallery@1.6.8/dist/js/lightgallery.min.js" defer></script><script src="https://cdn.jsdelivr.net/npm/justifiedGallery@3.7.0/dist/js/jquery.justifiedGallery.min.js" defer></script><script>window.addEventListener("load", () => {
+            if (typeof $.fn.lightGallery === 'function') {
+                $('.article').lightGallery({ selector: '.gallery-item' });
+            }
+            if (typeof $.fn.justifiedGallery === 'function') {
+                if ($('.justified-gallery > p > .gallery-item').length) {
+                    $('.justified-gallery > p > .gallery-item').unwrap();
+                }
+                $('.justified-gallery').justifiedGallery();
+            }
+        });</script><!--!--><!--!--><!--!--><!--!--><!--!--><script src="/js/main.js" defer></script><div class="searchbox"><div class="searchbox-container"><div class="searchbox-header"><div class="searchbox-input-container"><input class="searchbox-input" type="text" placeholder="想要查找什么..."></div><a class="searchbox-close" href="javascript:;">×</a></div><div class="searchbox-body"></div></div></div><script src="/js/insight.js" defer></script><script>document.addEventListener('DOMContentLoaded', function () {
+            loadInsight({"contentUrl":"/content.json"}, {"hint":"想要查找什么...","untitled":"(无标题)","posts":"文章","pages":"页面","categories":"分类","tags":"标签"});
+        });</script></body></html>
